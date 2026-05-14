@@ -16,7 +16,7 @@ export default function Layout({ children }: LayoutProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    service: 'Corporate Yoga',
+    service: 'Yoga Professional',
     message: ''
   });
 
@@ -26,25 +26,32 @@ export default function Layout({ children }: LayoutProps) {
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBookingStatus('loading');
+    console.log("Attempting to submit booking:", formData);
     try {
       const response = await fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, type: 'Booking' })
       });
+      
+      console.log("Server response status:", response.status);
+      
       const data = await response.json();
+      console.log("Server response data:", data);
+
       if (data.success) {
         setBookingStatus('success');
         setTimeout(() => {
           closeBookingModal();
           setBookingStatus('idle');
-          setFormData({ name: '', email: '', service: 'Corporate Yoga', message: '' });
+          setFormData({ name: '', email: '', service: 'Yoga Professional', message: '' });
         }, 5000);
       } else {
+        console.error("Booking failed:", data.message);
         setBookingStatus('error');
       }
     } catch (error) {
-      console.error("Booking error:", error);
+      console.error("Critical booking submission error:", error);
       setBookingStatus('error');
     }
   };

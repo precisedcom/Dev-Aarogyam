@@ -1,7 +1,9 @@
 import React from 'react';
-import { Apple, Leaf, Utensils, Heart, CheckCircle, Zap } from 'lucide-react';
+import { Apple, Leaf, Utensils, Heart, CheckCircle, Zap, ArrowRight } from 'lucide-react';
+import { useBookingModal } from '../context/BookingModalContext';
 
 export default function Nutrition() {
+  const { openBookingModal } = useBookingModal();
   const categories = [
     { 
       title: "Weight Management Diet", 
@@ -69,6 +71,12 @@ export default function Nutrition() {
                     <p className="text-xs text-gray-500">Tailored to your specific body type (Doshas).</p>
                  </div>
               </div>
+              <button 
+                onClick={openBookingModal}
+                className="mt-10 inline-flex items-center justify-center px-10 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-orange-200/50 transition-all hover:-translate-y-1"
+               >
+                 Get Your Diet Plan <ArrowRight className="ml-2 w-5 h-5" />
+               </button>
            </div>
            <div className="bg-gray-50 rounded-[3rem] p-12 border border-gray-100">
               <h4 className="text-2xl font-black text-gray-900 mb-8 border-b border-gray-200 pb-4">Our Methodology</h4>

@@ -7,8 +7,12 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn("GEMINI_API_KEY is not set in the environment. AI features will be disabled.");
+  }
+
   const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
+    apiKey: process.env.GEMINI_API_KEY || "",
     httpOptions: {
       headers: {
         'User-Agent': 'aistudio-build',
@@ -18,6 +22,12 @@ async function startServer() {
 
   // Middleware for parsing JSON
   app.use(express.json());
+
+  // Simple Request Logger
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+  });
 
   const inquiries: any[] = [];
 
@@ -34,48 +44,58 @@ async function startServer() {
 
   app.get("/api/wellness-tip", async (req, res) => {
     console.log("Generating wellness tip...");
+    if (!process.env.GEMINI_API_KEY) {
+      return res.json({ tip: "Start your day with deep breaths and a smile." });
+    }
+
     try {
       const response = await ai.models.generateContent({ 
-        model: "gemini-3-flash-preview", 
+        model: "gemini-flash-latest", 
         contents: "Give me one short, inspiring daily wellness or yoga tip (under 30 words).",
         config: {
           systemInstruction: "You are a calming wellness coach. Providing a daily positive affirmation or practical wellness tip."
         }
       });
       res.json({ tip: response.text || "Focus on your breath and let go of what no longer serves you." });
-    } catch (error) {
-      console.error("Gemini Error:", error);
+    } catch (error: any) {
+      console.error("Gemini Error Details:", JSON.stringify(error, null, 2));
       res.json({ tip: "Focus on your breath and let go of what no longer serves you." });
     }
   });
 
   // Example Booking/Contact API
   app.post("/api/book", (req, res) => {
-    console.log("Received POST to /api/book:", req.body);
+    console.log("Incoming POST to /api/book");
+    console.log("Headers:", req.headers);
+    console.log("Body:", req.body);
+
     const { name, email, service, message, type = 'Booking' } = req.body;
     
     if (!name || !email) {
-      console.warn("Invalid submission: missing name or email");
-      return res.status(400).json({ success: false, message: "Name and email are required." });
+      console.warn("Rejected: Invalid submission - missing name or email");
+      return res.status(400).json({ 
+        success: false, 
+        message: "Name and email are strictly required for inquiry processing." 
+      });
     }
     
     const newInquiry = {
       id: Date.now(),
-      name,
-      email,
-      service: service || 'General Inquiry',
-      message: message || '',
-      type,
+      name: String(name),
+      email: String(email),
+      service: String(service || 'General Inquiry'),
+      message: String(message || ''),
+      type: String(type),
       timestamp: new Date().toISOString()
     };
     inquiries.unshift(newInquiry);
 
-    console.log(`[Success] Inquiry Saved:`, newInquiry);
-    console.log(`[Email] Intended recipient: devarogyamyoga@gmail.com`);
+    console.log(`[Success] Inquiry Registered:`, newInquiry);
+    console.log(`[Email Alert] Simulation for: devarogyamyoga@gmail.com`);
     
-    res.json({ 
+    res.status(200).json({ 
       success: true, 
-      message: "Thank you! Your wellness request has been received. Acharya Gaurav will contact you soon." 
+      message: "Success! Your details have been recorded. Acharya Gaurav will reach out shortly." 
     });
   });
 

@@ -13,20 +13,28 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    console.log("Attempting to submit contact form:", formData);
     try {
       const response = await fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...formData, type: 'Contact' })
       });
+      
+      console.log("Server response status:", response.status);
+      
+      const data = await response.json();
+      console.log("Server response data:", data);
+
       if (response.ok) {
         setStatus('success');
         setFormData({ name: '', email: '', service: 'Corporate Wellness', message: '' });
       } else {
+        console.error("Submission failed:", data.message);
         setStatus('error');
       }
     } catch (error) {
-      console.error("Submission error:", error);
+      console.error("Critical submission error:", error);
       setStatus('error');
     }
   };
