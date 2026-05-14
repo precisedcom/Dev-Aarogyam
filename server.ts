@@ -1,10 +1,20 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
+import { GoogleGenAI } from "@google/genai";
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = 3000;
+
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    httpOptions: {
+      headers: {
+        'User-Agent': 'aistudio-build',
+      }
+    }
+  });
 
   // Middleware for parsing JSON
   app.use(express.json());
@@ -12,6 +22,22 @@ async function startServer() {
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
+
+  app.get("/api/wellness-tip", async (req, res) => {
+    try {
+      const response = await ai.models.generateContent({ 
+        model: "gemini-3-flash-preview", 
+        contents: "Give me one short, inspiring daily wellness or yoga tip (under 30 words).",
+        config: {
+          systemInstruction: "You are a calming wellness coach. Providing a daily positive affirmation or practical wellness tip."
+        }
+      });
+      res.json({ tip: response.text || "Focus on your breath and let go of what no longer serves you." });
+    } catch (error) {
+      console.error("Gemini Error:", error);
+      res.json({ tip: "Focus on your breath and let go of what no longer serves you." });
+    }
   });
 
   // Example Booking/Contact API
