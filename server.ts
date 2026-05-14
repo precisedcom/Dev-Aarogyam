@@ -19,9 +19,15 @@ async function startServer() {
   // Middleware for parsing JSON
   app.use(express.json());
 
+  const inquiries: any[] = [];
+
   // API Routes
   app.get("/api/health", (req, res) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
+  });
+
+  app.get("/api/admin/enquiries", (req, res) => {
+    res.json({ inquiries });
   });
 
   app.get("/api/wellness-tip", async (req, res) => {
@@ -44,10 +50,19 @@ async function startServer() {
   app.post("/api/book", (req, res) => {
     const { name, email, service, message, type = 'Booking' } = req.body;
     
-    console.log(`[Notification] New ${type} Request:`, { name, email, service, message });
+    const newInquiry = {
+      id: Date.now(),
+      name,
+      email,
+      service,
+      message,
+      type,
+      timestamp: new Date().toISOString()
+    };
+    inquiries.unshift(newInquiry);
+
+    console.log(`[Notification] New ${type} Request:`, newInquiry);
     console.log(`[Notification] Forwarding details to: devarogyamyoga@gmail.com`);
-    
-    // In a real app, you would integrate an email service here.
     
     res.json({ 
       success: true, 

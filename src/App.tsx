@@ -7,6 +7,7 @@ import Services from './pages/Services';
 import OurTeam from './pages/OurTeam';
 import Nutrition from './pages/Nutrition';
 import Contact from './pages/Contact';
+import Admin from './pages/Admin';
 import { BookingModalProvider } from './context/BookingModalContext';
 
 function ScrollToTop() {
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/team" element={<OurTeam />} />
             <Route path="/nutrition" element={<Nutrition />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </Layout>
       </BookingModalProvider>
