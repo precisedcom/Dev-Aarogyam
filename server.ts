@@ -23,14 +23,17 @@ async function startServer() {
 
   // API Routes
   app.get("/api/health", (req, res) => {
+    console.log("Health check pulse...");
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
 
   app.get("/api/admin/enquiries", (req, res) => {
+    console.log(`Admin requested enquiries list. Count: ${inquiries.length}`);
     res.json({ inquiries });
   });
 
   app.get("/api/wellness-tip", async (req, res) => {
+    console.log("Generating wellness tip...");
     try {
       const response = await ai.models.generateContent({ 
         model: "gemini-3-flash-preview", 
@@ -48,21 +51,27 @@ async function startServer() {
 
   // Example Booking/Contact API
   app.post("/api/book", (req, res) => {
+    console.log("Received POST to /api/book:", req.body);
     const { name, email, service, message, type = 'Booking' } = req.body;
+    
+    if (!name || !email) {
+      console.warn("Invalid submission: missing name or email");
+      return res.status(400).json({ success: false, message: "Name and email are required." });
+    }
     
     const newInquiry = {
       id: Date.now(),
       name,
       email,
-      service,
-      message,
+      service: service || 'General Inquiry',
+      message: message || '',
       type,
       timestamp: new Date().toISOString()
     };
     inquiries.unshift(newInquiry);
 
-    console.log(`[Notification] New ${type} Request:`, newInquiry);
-    console.log(`[Notification] Forwarding details to: devarogyamyoga@gmail.com`);
+    console.log(`[Success] Inquiry Saved:`, newInquiry);
+    console.log(`[Email] Intended recipient: devarogyamyoga@gmail.com`);
     
     res.json({ 
       success: true, 

@@ -103,7 +103,7 @@ export default function Contact() {
                         <CheckCircle className="w-12 h-12" />
                       </div>
                       <h4 className="text-2xl font-bold text-gray-900 mb-2">Message Transmitted!</h4>
-                      <p className="text-gray-600 mb-8">The Dev Aarogyam team has received your inquiry at devarogyamyoga@gmail.com. We will respond shortly.</p>
+                      <p className="text-gray-600 mb-8">The details have been sent to devarogyamyoga@gmail.com and saved in our admin report. Acharya Gaurav will respond shortly.</p>
                       <button 
                         onClick={() => setStatus('idle')}
                         className="px-8 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-all"

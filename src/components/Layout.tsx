@@ -154,7 +154,7 @@ export default function Layout({ children }: LayoutProps) {
                       <CheckCircle className="w-10 h-10" />
                     </div>
                     <h4 className="text-xl font-bold text-gray-900 mb-2">Request Sent Successfully!</h4>
-                    <p className="text-gray-600">Details have been sent to devarogyamyoga@gmail.com. Acharya Gaurav will get back to you shortly to discuss your wellness journey.</p>
+                    <p className="text-gray-600">Details have been sent to devarogyamyoga@gmail.com and recorded in our system. Acharya Gaurav will get back to you shortly.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleBookingSubmit} className="space-y-5">
@@ -270,6 +270,9 @@ export default function Layout({ children }: LayoutProps) {
               <li className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-orange-500" />
                 <span>Delhi NCR (Gurgaon & Noida)</span>
+              </li>
+              <li className="pt-2">
+                <Link to="/admin" className="text-[10px] text-gray-800 hover:text-orange-500 transition-colors uppercase tracking-widest font-bold">Admin Portal</Link>
               </li>
             </ul>
           </div>
