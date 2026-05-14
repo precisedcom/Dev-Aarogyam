@@ -7,6 +7,7 @@ import Services from './pages/Services';
 import OurTeam from './pages/OurTeam';
 import Nutrition from './pages/Nutrition';
 import Contact from './pages/Contact';
+import { BookingModalProvider } from './context/BookingModalContext';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -21,17 +22,19 @@ function ScrollToTop() {
 export default function App() {
   return (
     <Router>
-      <ScrollToTop />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/team" element={<OurTeam />} />
-          <Route path="/nutrition" element={<Nutrition />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-      </Layout>
+      <BookingModalProvider>
+        <ScrollToTop />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/team" element={<OurTeam />} />
+            <Route path="/nutrition" element={<Nutrition />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </Layout>
+      </BookingModalProvider>
     </Router>
   );
 }

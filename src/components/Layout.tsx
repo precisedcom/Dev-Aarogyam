@@ -3,6 +3,7 @@ import {
   Menu, X, Phone, Mail, MapPin, Send, Loader2, CheckCircle
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useBookingModal } from '../context/BookingModalContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const { isBookingModalOpen, openBookingModal, closeBookingModal } = useBookingModal();
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState({
     name: '',
@@ -35,7 +36,7 @@ export default function Layout({ children }: LayoutProps) {
       if (data.success) {
         setBookingStatus('success');
         setTimeout(() => {
-          setIsBookingModalOpen(false);
+          closeBookingModal();
           setBookingStatus('idle');
           setFormData({ name: '', email: '', service: 'Corporate Yoga', message: '' });
         }, 5000);
@@ -87,7 +88,7 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
               ))}
               <button 
-                onClick={() => setIsBookingModalOpen(true)}
+                onClick={openBookingModal}
                 className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-2.5 rounded-full font-medium hover:from-orange-600 hover:to-yellow-600 transition-all shadow-sm"
               >
                 Book Session
@@ -117,7 +118,7 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             ))}
             <button 
-              onClick={() => { setIsBookingModalOpen(true); toggleMenu(); }}
+              onClick={() => { openBookingModal(); toggleMenu(); }}
               className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-center px-4 py-3 rounded-md font-medium mt-4 shadow-sm"
             >
               Book a Session
@@ -133,22 +134,19 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Booking Modal (Shared) */}
       {isBookingModalOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={() => setIsBookingModalOpen(false)}>
-              <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
-            </div>
+        <div className="fixed inset-0 z-[9999] overflow-y-auto flex items-center justify-center">
+          <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={closeBookingModal}>
+            <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+          </div>
 
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-orange-100">
-              <div className="bg-white px-6 pt-6 pb-4 sm:p-8 sm:pb-4">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">Enquire for Wellness</h3>
-                  <button onClick={() => setIsBookingModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
+          <div className="bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 align-middle sm:max-w-lg sm:w-full border border-orange-100 z-[10000] mx-4">
+            <div className="bg-white px-6 pt-6 pb-4 sm:p-8 sm:pb-4">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900">Enquire for Wellness</h3>
+                <button onClick={closeBookingModal} className="text-gray-400 hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
 
                 {bookingStatus === 'success' ? (
                   <div className="py-12 text-center">
@@ -231,7 +229,6 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             </div>
           </div>
-        </div>
       )}
 
       {/* Footer */}

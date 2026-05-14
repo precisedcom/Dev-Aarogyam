@@ -4,8 +4,10 @@ import {
   Sparkles, Award, MapPin, ChevronRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useBookingModal } from '../context/BookingModalContext';
 
 export default function Services() {
+  const { openBookingModal } = useBookingModal();
   const services = [
     { title: "Yoga Professional", Icon: Users, desc: "Mastering Hatha, Ashtanga, and Therapeutic Yoga for deep internal balance and physical flexibility.", category: "Core Wellness" },
     { title: "Zumba Professional", Icon: Heart, desc: "High-energy cardiovascular workouts combining latin dance and fitness for weight loss and joy.", category: "Fitness" },
@@ -47,9 +49,12 @@ export default function Services() {
               <p className="text-gray-500 leading-relaxed mb-8 flex-grow">
                 {service.desc}
               </p>
-              <Link to="/contact" className="inline-flex items-center text-orange-600 font-bold group-hover:gap-2 transition-all">
+              <button 
+                onClick={openBookingModal}
+                className="inline-flex items-center text-orange-600 font-bold group-hover:gap-2 transition-all cursor-pointer"
+              >
                 Book This Service <ChevronRight className="ml-1 w-4 h-4" />
-              </Link>
+              </button>
             </div>
           ))}
         </div>

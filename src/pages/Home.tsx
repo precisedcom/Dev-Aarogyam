@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getWellnessTip } from '../services/geminiService';
+import { useBookingModal } from '../context/BookingModalContext';
 
 export default function Home() {
+  const { openBookingModal } = useBookingModal();
   const [dailyTip, setDailyTip] = useState<string>('');
   const [isTipLoading, setIsTipLoading] = useState(true);
 
@@ -86,12 +88,12 @@ export default function Home() {
                 </p>
                 <div className="mt-8 sm:flex sm:justify-center lg:justify-start gap-4">
                   <div className="rounded-md shadow">
-                    <Link 
-                      to="/contact"
+                    <button 
+                      onClick={openBookingModal}
                       className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 md:py-4 md:text-lg md:px-10 transition-all shadow-md hover:shadow-lg"
                     >
                       Book a Session
-                    </Link>
+                    </button>
                   </div>
                   <div className="mt-3 sm:mt-0 rounded-md">
                     <Link to="/services" className="w-full flex items-center justify-center px-8 py-3 border-2 border-gray-200 text-base font-medium rounded-full text-gray-700 bg-white hover:bg-orange-50 hover:border-orange-200 md:py-4 md:text-lg md:px-10 transition-all">
@@ -289,9 +291,12 @@ export default function Home() {
            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
              Whether at home, office, or online — get certified expert guidance.
            </p>
-           <Link to="/contact" className="inline-flex items-center justify-center px-10 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-orange-200/50 transition-all hover:-translate-y-1">
-             Contact Us Now <ArrowRight className="ml-2 w-5 h-5" />
-           </Link>
+           <button 
+            onClick={openBookingModal}
+            className="inline-flex items-center justify-center px-10 py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full font-bold text-lg shadow-lg hover:shadow-orange-200/50 transition-all hover:-translate-y-1"
+           >
+             Book Session Now <ArrowRight className="ml-2 w-5 h-5" />
+           </button>
         </div>
       </section>
     </>
