@@ -2,13 +2,47 @@ import React, { useState } from 'react';
 import { 
   Heart, Activity, Users, Shield, Palette, 
   CheckCircle, Mail, Phone, MapPin, Menu, X, 
-  ArrowRight, Award, Briefcase, ChevronRight, Sparkles
+  ArrowRight, Award, Briefcase, ChevronRight, Sparkles, Send, Loader2
 } from 'lucide-react';
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    service: 'Corporate Yoga',
+    message: ''
+  });
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleBookingSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBookingStatus('loading');
+    try {
+      const response = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      if (data.success) {
+        setBookingStatus('success');
+        setTimeout(() => {
+          setIsBookingModalOpen(false);
+          setBookingStatus('idle');
+          setFormData({ name: '', email: '', service: 'Corporate Yoga', message: '' });
+        }, 3000);
+      } else {
+        setBookingStatus('error');
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+      setBookingStatus('error');
+    }
+  };
 
   const services = [
     { title: "Corporate Yoga", Icon: Users, desc: "Tailored sessions to improve posture, reduce workplace stress, and boost employee productivity." },
@@ -54,9 +88,12 @@ export default function App() {
               <a href="#about" className="text-gray-600 hover:text-orange-600 font-medium transition-colors">About Us</a>
               <a href="#services" className="text-gray-600 hover:text-orange-600 font-medium transition-colors">Services</a>
               <a href="#corporate" className="text-gray-600 hover:text-orange-600 font-medium transition-colors">Corporate Portfolio</a>
-              <a href="#contact" className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-2.5 rounded-full font-medium hover:from-orange-600 hover:to-yellow-600 transition-all shadow-sm">
+              <button 
+                onClick={() => setIsBookingModalOpen(true)}
+                className="bg-gradient-to-r from-orange-500 to-yellow-500 text-white px-6 py-2.5 rounded-full font-medium hover:from-orange-600 hover:to-yellow-600 transition-all shadow-sm"
+              >
                 Book a Session
-              </a>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -74,9 +111,12 @@ export default function App() {
             <a href="#about" onClick={toggleMenu} className="block text-gray-600 font-medium py-2">About Us</a>
             <a href="#services" onClick={toggleMenu} className="block text-gray-600 font-medium py-2">Services</a>
             <a href="#corporate" onClick={toggleMenu} className="block text-gray-600 font-medium py-2">Corporate Portfolio</a>
-            <a href="#contact" onClick={toggleMenu} className="block bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-center px-4 py-3 rounded-md font-medium mt-4">
+            <button 
+              onClick={() => { setIsBookingModalOpen(true); toggleMenu(); }}
+              className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white text-center px-4 py-3 rounded-md font-medium mt-4"
+            >
               Book a Session
-            </a>
+            </button>
           </div>
         )}
       </nav>
@@ -99,9 +139,12 @@ export default function App() {
                 </p>
                 <div className="mt-8 sm:flex sm:justify-center lg:justify-start gap-4">
                   <div className="rounded-md shadow">
-                    <a href="#contact" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 md:py-4 md:text-lg md:px-10 transition-all shadow-md hover:shadow-lg">
+                    <button 
+                      onClick={() => setIsBookingModalOpen(true)}
+                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 md:py-4 md:text-lg md:px-10 transition-all shadow-md hover:shadow-lg"
+                    >
                       Transform Your Workplace
-                    </a>
+                    </button>
                   </div>
                   <div className="mt-3 sm:mt-0 rounded-md">
                     <a href="#services" className="w-full flex items-center justify-center px-8 py-3 border-2 border-gray-200 text-base font-medium rounded-full text-gray-700 bg-white hover:bg-orange-50 hover:border-orange-200 md:py-4 md:text-lg md:px-10 transition-all">
@@ -313,12 +356,115 @@ export default function App() {
               </div>
             </div>
 
-            <button className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 shadow-md transition-all hover:-translate-y-1">
+            <button 
+              onClick={() => setIsBookingModalOpen(true)}
+              className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-medium rounded-full text-white bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 shadow-md transition-all hover:-translate-y-1"
+            >
               Contact Us Now <ArrowRight className="ml-2 w-5 h-5" />
             </button>
           </div>
         </div>
       </section>
+
+      {/* Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true" onClick={() => setIsBookingModalOpen(false)}>
+              <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm"></div>
+            </div>
+
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div className="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-orange-100">
+              <div className="bg-white px-6 pt-6 pb-4 sm:p-8 sm:pb-4">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900">Enquire for Wellness</h3>
+                  <button onClick={() => setIsBookingModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {bookingStatus === 'success' ? (
+                  <div className="py-12 text-center">
+                    <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center text-green-600 mx-auto mb-6">
+                      <CheckCircle className="w-10 h-10" />
+                    </div>
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">Request Sent Successfully!</h4>
+                    <p className="text-gray-600">Acharya Gaurav will get back to you shortly to discuss your wellness journey.</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleBookingSubmit} className="space-y-5">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                        placeholder="e.g. John Doe"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Official Email</label>
+                      <input 
+                        required
+                        type="email" 
+                        value={formData.email}
+                        onChange={(e) => setFormData({...formData, email: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                        placeholder="john@company.com"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Interested Service</label>
+                      <select 
+                        value={formData.service}
+                        onChange={(e) => setFormData({...formData, service: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all appearance-none bg-no-repeat bg-[right_1rem_center]"
+                      >
+                        {services.map((s, i) => <option key={i}>{s.title}</option>)}
+                        <option>Other / Personalized Session</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Specific Requirements</label>
+                      <textarea 
+                        rows={3}
+                        value={formData.message}
+                        onChange={(e) => setFormData({...formData, message: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                        placeholder="Tell us more about your team or goals..."
+                      />
+                    </div>
+                    
+                    <button 
+                      type="submit"
+                      disabled={bookingStatus === 'loading'}
+                      className="w-full py-4 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-orange-200/50 transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:opacity-70"
+                    >
+                      {bookingStatus === 'loading' ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          Request Callback <Send className="w-5 h-5" />
+                        </>
+                      )}
+                    </button>
+                    {bookingStatus === 'error' && (
+                       <p className="text-red-500 text-center text-sm font-medium">Something went wrong. Please try again or contact us directly.</p>
+                    )}
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="bg-gray-950 text-gray-400 py-12">
