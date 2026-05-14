@@ -65,38 +65,47 @@ async function startServer() {
 
   // Example Booking/Contact API
   app.post("/api/book", (req, res) => {
-    console.log("Incoming POST to /api/book");
-    console.log("Headers:", req.headers);
-    console.log("Body:", req.body);
+    try {
+      console.log("Incoming POST to /api/book");
+      console.log("Headers:", JSON.stringify(req.headers));
+      console.log("Body:", JSON.stringify(req.body));
 
-    const { name, email, service, message, type = 'Booking' } = req.body;
-    
-    if (!name || !email) {
-      console.warn("Rejected: Invalid submission - missing name or email");
-      return res.status(400).json({ 
+      const { name, email, service, message, type = 'Booking' } = req.body;
+      
+      if (!name || !email) {
+        console.warn("Rejected: Invalid submission - missing name or email");
+        return res.status(400).json({ 
+          success: false, 
+          message: "Name and email are strictly required for inquiry processing." 
+        });
+      }
+      
+      const newInquiry = {
+        id: Date.now(),
+        name: String(name),
+        email: String(email),
+        service: String(service || 'General Inquiry'),
+        message: String(message || ''),
+        type: String(type),
+        timestamp: new Date().toISOString()
+      };
+      
+      inquiries.unshift(newInquiry);
+
+      console.log(`[Success] Inquiry Registered:`, JSON.stringify(newInquiry));
+      console.log(`[Email Alert] Simulation for: devarogyamyoga@gmail.com`);
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: "Success! Your details have been recorded. Acharya Gaurav will reach out shortly." 
+      });
+    } catch (err: any) {
+      console.error("POST /api/book Crashed:", err);
+      return res.status(500).json({ 
         success: false, 
-        message: "Name and email are strictly required for inquiry processing." 
+        message: `Internal Server Error: ${err.message}` 
       });
     }
-    
-    const newInquiry = {
-      id: Date.now(),
-      name: String(name),
-      email: String(email),
-      service: String(service || 'General Inquiry'),
-      message: String(message || ''),
-      type: String(type),
-      timestamp: new Date().toISOString()
-    };
-    inquiries.unshift(newInquiry);
-
-    console.log(`[Success] Inquiry Registered:`, newInquiry);
-    console.log(`[Email Alert] Simulation for: devarogyamyoga@gmail.com`);
-    
-    res.status(200).json({ 
-      success: true, 
-      message: "Success! Your details have been recorded. Acharya Gaurav will reach out shortly." 
-    });
   });
 
   // Vite middleware for development

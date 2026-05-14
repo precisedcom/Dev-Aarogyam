@@ -9,6 +9,7 @@ export default function Contact() {
     message: ''
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState<string>('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,13 +29,16 @@ export default function Contact() {
 
       if (response.ok) {
         setStatus('success');
+        setErrorMsg('');
         setFormData({ name: '', email: '', service: 'Corporate Wellness', message: '' });
       } else {
         console.error("Submission failed:", data.message);
+        setErrorMsg(data.message || 'Server rejected the request');
         setStatus('error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Critical submission error:", error);
+      setErrorMsg(error.message || 'Network error occurred');
       setStatus('error');
     }
   };
@@ -188,7 +192,10 @@ export default function Contact() {
                           )}
                        </button>
                        {status === 'error' && (
-                         <p className="text-red-500 text-center font-bold">Failed to send. Please try again later.</p>
+                         <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl">
+                            <p className="text-red-600 text-center text-sm font-bold">Inquiry Failed: {errorMsg}</p>
+                            <p className="text-red-400 text-center text-xs mt-1">Please try calling +91 97737 34200</p>
+                         </div>
                        )}
                     </form>
                   )}

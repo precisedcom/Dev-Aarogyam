@@ -13,6 +13,7 @@ export default function Layout({ children }: LayoutProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isBookingModalOpen, openBookingModal, closeBookingModal } = useBookingModal();
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -41,6 +42,7 @@ export default function Layout({ children }: LayoutProps) {
 
       if (data.success) {
         setBookingStatus('success');
+        setErrorMsg('');
         setTimeout(() => {
           closeBookingModal();
           setBookingStatus('idle');
@@ -48,10 +50,12 @@ export default function Layout({ children }: LayoutProps) {
         }, 5000);
       } else {
         console.error("Booking failed:", data.message);
+        setErrorMsg(data.message || 'Server rejected the request');
         setBookingStatus('error');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Critical booking submission error:", error);
+      setErrorMsg(error.message || 'Network error occurred');
       setBookingStatus('error');
     }
   };
@@ -229,7 +233,10 @@ export default function Layout({ children }: LayoutProps) {
                       )}
                     </button>
                     {bookingStatus === 'error' && (
-                       <p className="text-red-500 text-center text-sm font-medium">Something went wrong. Please try again or contact us directly.</p>
+                       <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-xl">
+                         <p className="text-red-600 text-center text-sm font-bold">Error: {errorMsg}</p>
+                         <p className="text-red-400 text-center text-[10px] mt-1 font-medium italic">Please contact +91 97737 34200 directly if this persists.</p>
+                       </div>
                     )}
                   </form>
                 )}
