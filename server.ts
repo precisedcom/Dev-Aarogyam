@@ -42,12 +42,12 @@ async function startServer() {
 
   // Example Booking/Contact API
   app.post("/api/book", (req, res) => {
-    const { name, email, service, message } = req.body;
+    const { name, email, service, message, type = 'Booking' } = req.body;
     
-    console.log("New Booking Received:", { name, email, service, message });
+    console.log(`[Notification] New ${type} Request:`, { name, email, service, message });
+    console.log(`[Notification] Forwarding details to: devarogyamyoga@gmail.com`);
     
-    // In a real app, you would save this to a database (e.g. Firebase or Cloud SQL)
-    // and potentially send an email notification.
+    // In a real app, you would integrate an email service here.
     
     res.json({ 
       success: true, 

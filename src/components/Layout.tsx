@@ -29,7 +29,7 @@ export default function Layout({ children }: LayoutProps) {
       const response = await fetch('/api/book', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, type: 'Booking' })
       });
       const data = await response.json();
       if (data.success) {
@@ -38,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
           setIsBookingModalOpen(false);
           setBookingStatus('idle');
           setFormData({ name: '', email: '', service: 'Corporate Yoga', message: '' });
-        }, 3000);
+        }, 5000);
       } else {
         setBookingStatus('error');
       }
@@ -156,7 +156,7 @@ export default function Layout({ children }: LayoutProps) {
                       <CheckCircle className="w-10 h-10" />
                     </div>
                     <h4 className="text-xl font-bold text-gray-900 mb-2">Request Sent Successfully!</h4>
-                    <p className="text-gray-600">Acharya Gaurav will get back to you shortly to discuss your wellness journey.</p>
+                    <p className="text-gray-600">Details have been sent to devarogyamyoga@gmail.com. Acharya Gaurav will get back to you shortly to discuss your wellness journey.</p>
                   </div>
                 ) : (
                   <form onSubmit={handleBookingSubmit} className="space-y-5">

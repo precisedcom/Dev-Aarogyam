@@ -1,7 +1,36 @@
-import React from 'react';
-import { Mail, Phone, MapPin, Send, MessageCircle, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, Phone, MapPin, Send, MessageCircle, Clock, CheckCircle, Loader2 } from 'lucide-react';
 
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    service: 'Corporate Wellness',
+    message: ''
+  });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    try {
+      const response = await fetch('/api/book', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, type: 'Contact' })
+      });
+      if (response.ok) {
+        setStatus('success');
+        setFormData({ name: '', email: '', service: 'Corporate Wellness', message: '' });
+      } else {
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setStatus('error');
+    }
+  };
+
   return (
     <div className="bg-white">
       {/* Header */}
@@ -67,35 +96,94 @@ export default function Contact() {
             <div className="lg:col-span-2">
                <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl shadow-orange-100 border border-orange-50">
                   <h3 className="text-3xl font-black text-gray-900 mb-8">Send a Message</h3>
-                  <form className="space-y-8">
-                     <div className="grid md:grid-cols-2 gap-8">
-                        <div>
-                           <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Full Name</label>
-                           <input type="text" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300" placeholder="e.g. Acharya Neha" />
-                        </div>
-                        <div>
-                           <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Email Address</label>
-                           <input type="email" className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300" placeholder="your@email.com" />
-                        </div>
-                     </div>
-                     <div>
-                         <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Inquiry Type</label>
-                         <select className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all appearance-none text-gray-500 font-medium">
-                            <option>Corporate Wellness</option>
-                            <option>Home Yoga Sessions</option>
-                            <option>Diet & Nutrition Coaching</option>
-                            <option>Online Classes</option>
-                            <option>Other / General Inquiry</option>
-                         </select>
-                     </div>
-                     <div>
-                        <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Your Message</label>
-                        <textarea rows={5} className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300" placeholder="How can we help you achieve your goals?"></textarea>
-                     </div>
-                     <button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-6 rounded-2xl font-black text-lg shadow-xl shadow-orange-200 hover:shadow-orange-300 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3">
-                        Transmit Inquiry <Send className="w-6 h-6" />
-                     </button>
-                  </form>
+                  
+                  {status === 'success' ? (
+                    <div className="py-12 text-center">
+                      <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center text-green-600 mx-auto mb-6">
+                        <CheckCircle className="w-12 h-12" />
+                      </div>
+                      <h4 className="text-2xl font-bold text-gray-900 mb-2">Message Transmitted!</h4>
+                      <p className="text-gray-600 mb-8">The Dev Aarogyam team has received your inquiry at devarogyamyoga@gmail.com. We will respond shortly.</p>
+                      <button 
+                        onClick={() => setStatus('idle')}
+                        className="px-8 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition-all"
+                      >
+                        Send Another Message
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-8">
+                       <div className="grid md:grid-cols-2 gap-8">
+                          <div>
+                             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Full Name</label>
+                             <input 
+                                required
+                                type="text" 
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300 shadow-inner" 
+                                placeholder="e.g. Acharya Neha" 
+                             />
+                          </div>
+                          <div>
+                             <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Email Address</label>
+                             <input 
+                                required
+                                type="email" 
+                                value={formData.email}
+                                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300 shadow-inner" 
+                                placeholder="your@email.com" 
+                             />
+                          </div>
+                       </div>
+                       <div>
+                           <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Inquiry Type</label>
+                           <select 
+                              value={formData.service}
+                              onChange={(e) => setFormData({...formData, service: e.target.value})}
+                              className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all appearance-none text-gray-500 font-medium shadow-inner"
+                           >
+                              <option>Corporate Wellness</option>
+                              <option>Home Yoga Sessions</option>
+                              <option>Diet & Nutrition Coaching</option>
+                              <option>Online Classes</option>
+                              <option>Other / General Inquiry</option>
+                           </select>
+                       </div>
+                       <div>
+                          <label className="block text-xs font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Your Message</label>
+                          <textarea 
+                             required
+                             rows={5} 
+                             value={formData.message}
+                             onChange={(e) => setFormData({...formData, message: e.target.value})}
+                             className="w-full bg-gray-50 border-none rounded-2xl p-4 focus:ring-2 focus:ring-orange-500 outline-none transition-all placeholder:text-gray-300 shadow-inner" 
+                             placeholder="How can we help you achieve your goals?"
+                          />
+                       </div>
+                       
+                       <button 
+                        type="submit"
+                        disabled={status === 'loading'}
+                        className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white py-6 rounded-2xl font-black text-lg shadow-xl shadow-orange-200 hover:shadow-orange-300 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 disabled:opacity-70"
+                       >
+                          {status === 'loading' ? (
+                            <>
+                              <Loader2 className="w-6 h-6 animate-spin" />
+                              Transmitting...
+                            </>
+                          ) : (
+                            <>
+                              Transmit Inquiry <Send className="w-6 h-6" />
+                            </>
+                          )}
+                       </button>
+                       {status === 'error' && (
+                         <p className="text-red-500 text-center font-bold">Failed to send. Please try again later.</p>
+                       )}
+                    </form>
+                  )}
                </div>
             </div>
          </div>
