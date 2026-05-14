@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Heart, Activity, Users, Shield, Palette, 
   CheckCircle, Mail, Phone, MapPin, Menu, X, 
-  ArrowRight, Award, Briefcase, ChevronRight, Sparkles, Send, Loader2
+  ArrowRight, Award, Briefcase, ChevronRight, Sparkles, Send, Loader2, Lightbulb
 } from 'lucide-react';
+import { getWellnessTip } from './services/geminiService';
 
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [bookingStatus, setBookingStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [dailyTip, setDailyTip] = useState<string>('');
+  const [isTipLoading, setIsTipLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     service: 'Corporate Yoga',
     message: ''
   });
+
+  useEffect(() => {
+    async function fetchTip() {
+      setIsTipLoading(true);
+      const tip = await getWellnessTip();
+      setDailyTip(tip);
+      setIsTipLoading(false);
+    }
+    fetchTip();
+  }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -163,6 +176,42 @@ export default function App() {
             alt="Corporate Yoga Session"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white to-transparent lg:via-white/20"></div>
+        </div>
+      </section>
+
+      {/* Daily Wellness Tip (AI Powered) */}
+      <section className="bg-white py-12 border-y border-orange-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row items-center gap-8 border border-orange-100 shadow-sm">
+            <div className="bg-white p-4 rounded-2xl shadow-sm text-orange-500 shrink-0">
+              <Lightbulb className="w-10 h-10 animate-pulse" />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                <span className="text-orange-600 font-bold uppercase tracking-widest text-xs">AI Wellness Wisdom</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+              </div>
+              {isTipLoading ? (
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4 mx-auto md:mx-0"></div>
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2 mx-auto md:mx-0"></div>
+                </div>
+              ) : (
+                <h4 className="text-2xl font-serif italic text-gray-800 leading-relaxed">
+                  "{dailyTip}"
+                </h4>
+              )}
+            </div>
+            <button 
+              onClick={() => {
+                setIsTipLoading(true);
+                getWellnessTip().then(setDailyTip).finally(() => setIsTipLoading(false));
+              }}
+              className="px-6 py-2 bg-white border border-orange-200 text-orange-600 rounded-full font-medium text-sm hover:bg-orange-100 transition-all shadow-sm shrink-0"
+            >
+              Get New Tip
+            </button>
+          </div>
         </div>
       </section>
 
