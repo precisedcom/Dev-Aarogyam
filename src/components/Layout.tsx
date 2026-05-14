@@ -260,12 +260,20 @@ export default function Layout({ children }: LayoutProps) {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-semibold mb-6 uppercase text-xs tracking-widest">Coverage Zones</h4>
-            <ul className="space-y-3 text-sm italic text-gray-500">
-              <li>Gurugram & Delhi NCR</li>
-              <li>Noida & Greater Noida</li>
-              <li>Ghaziabad & Faridabad</li>
-              <li>South Delhi Premium</li>
+            <h4 className="text-white font-semibold mb-6 uppercase text-xs tracking-widest">Contact Us</h4>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-orange-500" />
+                <span>+91 97737 34200</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-orange-500" />
+                <span>devarogyamyoga@gmail.com</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-orange-500" />
+                <span>Delhi NCR (Gurgaon & Noida)</span>
+              </li>
             </ul>
           </div>
           <div>
@@ -273,7 +281,7 @@ export default function Layout({ children }: LayoutProps) {
               <div className="text-2xl text-white font-black">5 YEARS</div>
               <div className="text-[10px] uppercase tracking-widest text-orange-500">Experience Excellence</div>
             </div>
-            <p className="text-xs mt-6">© {new Date().getFullYear()} Dev Aarogyam Yoga. Developed for peak wellness in Delhi NCR.</p>
+            <p className="text-xs mt-6">© {new Date().getFullYear()} devAarogyamYoga.com. All rights reserved.</p>
           </div>
         </div>
       </footer>

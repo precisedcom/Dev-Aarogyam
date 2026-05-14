@@ -38,11 +38,11 @@ export default function Home() {
   ];
 
   const clients = [
-    "Tech Mahindra Pvt. Ltd.",
-    "Infosys, Gurgaon",
-    "Amu Leasing Pvt. Ltd.",
-    "Coorohealth Infotech",
-    "Rexxam Dixon Electronics",
+    "Tech Mahindra Pvt. Ltd., Noida Sector 62",
+    "Amu Leasing Pvt. Ltd., Gurgaon",
+    "Infosys, Gurgaon (Admiral Group Building 6B)",
+    "Coorohealth Infotech Pvt. Ltd.",
+    "Rexxam Dixon Electronics Pvt. Ltd., B18 Phase 2, Noida",
     "Mozaiq Automation",
     "Apertum Online Pvt. Ltd."
   ];
@@ -230,10 +230,10 @@ export default function Home() {
               <p className="text-gray-300 text-lg mb-8 leading-relaxed">
                 We have successfully designed and delivered yoga programs tailored specifically to corporate settings in Delhi NCR.
               </p>
-              <ul className="space-y-4">
-                {clients.slice(0, 4).map((client, idx) => (
-                  <li key={idx} className="flex items-center text-gray-200">
-                    <ChevronRight className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0" />
+              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                {clients.map((client, idx) => (
+                  <li key={idx} className="flex items-center text-gray-200 text-sm">
+                    <ChevronRight className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" />
                     <span>{client}</span>
                   </li>
                 ))}

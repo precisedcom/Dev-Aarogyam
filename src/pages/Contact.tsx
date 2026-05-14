@@ -27,8 +27,8 @@ export default function Contact() {
                         </div>
                         <div>
                            <h4 className="font-bold text-gray-900 mb-1 italic">Phone Inquiries</h4>
-                           <p className="text-gray-500 font-medium tracking-wide">+91 XXXXX XXXXX</p>
-                           <p className="text-xs text-orange-500 mt-1 uppercase font-bold">Call or WhatsApp</p>
+                           <p className="text-gray-500 font-medium tracking-wide">+91 97737 34200</p>
+                           <p className="text-xs text-orange-500 mt-1 uppercase font-bold text-center sm:text-left">Call or WhatsApp</p>
                         </div>
                      </div>
                      <div className="flex gap-6 items-start">
@@ -37,7 +37,7 @@ export default function Contact() {
                         </div>
                         <div>
                            <h4 className="font-bold text-gray-900 mb-1 italic">Email Support</h4>
-                           <p className="text-gray-500 font-medium">hello@devaarogyam.com</p>
+                           <p className="text-gray-500 font-medium tracking-wide">devarogyamyoga@gmail.com</p>
                         </div>
                      </div>
                      <div className="flex gap-6 items-start">
