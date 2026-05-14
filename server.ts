@@ -23,36 +23,38 @@ async function startServer() {
   // Middleware for parsing JSON
   app.use(express.json());
 
-  // Simple Request Logger
+  // Comprehensive Request Logger
   app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${req.method} ${req.url}`);
+    if (req.url.startsWith('/api')) {
+      console.log(`    Headers: ${JSON.stringify(req.headers)}`);
+      if (req.method === 'POST') console.log(`    Body: ${JSON.stringify(req.body)}`);
+    }
     next();
   });
 
   const inquiries: any[] = [];
 
-  // API Routes
-  app.get("/api/health", (req, res) => {
-    console.log("Health check pulse...");
+  // Define API Router to isolate routes
+  const apiRouter = express.Router();
+
+  apiRouter.get("/health", (req, res) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
 
-  app.get("/api/admin/enquiries", (req, res) => {
-    console.log(`Admin requested enquiries list. Count: ${inquiries.length}`);
+  apiRouter.get("/admin/enquiries", (req, res) => {
     res.json({ inquiries });
   });
 
-  app.post("/api/test-post", (req, res) => {
-    console.log("Test POST hit");
+  apiRouter.post("/test-post", (req, res) => {
     res.json({ success: true, message: "POST works" });
   });
 
-  app.get("/api/wellness-tip", async (req, res) => {
-    console.log("Generating wellness tip...");
+  apiRouter.get("/wellness-tip", async (req, res) => {
     if (!process.env.GEMINI_API_KEY) {
       return res.json({ tip: "Start your day with deep breaths and a smile." });
     }
-
     try {
       const response = await ai.models.generateContent({ 
         model: "gemini-flash-latest", 
@@ -63,25 +65,19 @@ async function startServer() {
       });
       res.json({ tip: response.text || "Focus on your breath and let go of what no longer serves you." });
     } catch (error: any) {
-      console.error("Gemini Error Details:", JSON.stringify(error, null, 2));
+      console.error("Gemini Error:", error);
       res.json({ tip: "Focus on your breath and let go of what no longer serves you." });
     }
   });
 
-  // Example Booking/Contact API
-  app.post("/api/book", (req, res) => {
+  apiRouter.post("/book", (req, res) => {
     try {
-      console.log("Incoming POST to /api/book");
-      console.log("Headers:", JSON.stringify(req.headers));
-      console.log("Body:", JSON.stringify(req.body));
-
       const { name, email, service, message, type = 'Booking' } = req.body;
       
       if (!name || !email) {
-        console.warn("Rejected: Invalid submission - missing name or email");
         return res.status(400).json({ 
           success: false, 
-          message: "Name and email are strictly required for inquiry processing." 
+          message: "Name and email are strictly required." 
         });
       }
       
@@ -96,26 +92,24 @@ async function startServer() {
       };
       
       inquiries.unshift(newInquiry);
-
-      console.log(`[Success] Inquiry Registered:`, JSON.stringify(newInquiry));
-      console.log(`[Email Alert] Simulation for: devarogyamyoga@gmail.com`);
+      console.log(`[Success] Inquiry Registered: ${newInquiry.id}`);
       
-      return res.status(200).json({ 
+      res.status(200).json({ 
         success: true, 
-        message: "Success! Your details have been recorded. Acharya Gaurav will reach out shortly." 
+        message: "Details recorded. Acharya Gaurav will reach out shortly." 
       });
     } catch (err: any) {
-      console.error("POST /api/book Crashed:", err);
-      return res.status(500).json({ 
-        success: false, 
-        message: `Internal Server Error: ${err.message}` 
-      });
+      console.error("API Error /book:", err);
+      res.status(500).json({ success: false, message: err.message });
     }
   });
 
-  // Catch-all for unknown API routes to avoid returning HTML explicitly
+  // Mount API Router
+  app.use("/api", apiRouter);
+
+  // Catch-all for unknown /api/* routes
   app.all("/api/*", (req, res) => {
-    console.warn(`[404] Missed API Route: ${req.method} ${req.url}`);
+    console.warn(`[404] API Not Found: ${req.method} ${req.url}`);
     res.status(404).json({ 
       success: false, 
       message: `API Route not found: ${req.method} ${req.url}` 
