@@ -42,6 +42,11 @@ async function startServer() {
     res.json({ inquiries });
   });
 
+  app.post("/api/test-post", (req, res) => {
+    console.log("Test POST hit");
+    res.json({ success: true, message: "POST works" });
+  });
+
   app.get("/api/wellness-tip", async (req, res) => {
     console.log("Generating wellness tip...");
     if (!process.env.GEMINI_API_KEY) {
@@ -106,6 +111,15 @@ async function startServer() {
         message: `Internal Server Error: ${err.message}` 
       });
     }
+  });
+
+  // Catch-all for unknown API routes to avoid returning HTML explicitly
+  app.all("/api/*", (req, res) => {
+    console.warn(`[404] Missed API Route: ${req.method} ${req.url}`);
+    res.status(404).json({ 
+      success: false, 
+      message: `API Route not found: ${req.method} ${req.url}` 
+    });
   });
 
   // Vite middleware for development

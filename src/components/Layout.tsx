@@ -37,6 +37,13 @@ export default function Layout({ children }: LayoutProps) {
       
       console.log("Server response status:", response.status);
       
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        throw new Error(`Server returned non-JSON response (${response.status}). Please check server logs.`);
+      }
+
       const data = await response.json();
       console.log("Server response data:", data);
 
